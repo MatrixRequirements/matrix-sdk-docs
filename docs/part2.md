@@ -114,6 +114,8 @@ Project has 22 REQ Items, and 3 UC Items
 mstanton@darkstar:~/examples/users-guide (main)$ 
 ```
 
+## Category object also returns search results
+
 If you want to get all the items for a particular Category, you can request this directly from the
 Category object without using one of the search methods already mentioned, see line 15 below. And you can still
 use a mask to retrieve partial items if you like.
@@ -155,3 +157,128 @@ mstanton@darkstar:~/examples/users-guide (main)$ node partial-search-3
 The average number of Use Case Steps in UC Items is 5.666666666666667
 mstanton@darkstar:~/examples/users-guide (main)$ 
 ```
+
+## A search retrieving Label information
+
+Of course, maybe you don't want any Fields to be brought down at all, only, say, labels.
+It's all in the `constructSearchFieldMask()` function, where the first parameter, **includeFields** is a boolean
+value. The second parameter, **includeLabels** is also a boolean. Both of these have a default value of
+true if left unspecified. The next two parameters, **includeDownlinks** and **includeUplinks** have a default
+value of false. Let's have a code example where we get Item objects, but no Category Fields, thus reducing
+download time. We get all the labels and print out the ones we found:
+
+
+```js title="partial-search-4.js"
+const lib = require("./lib.js");
+
+async function run() {
+    const server = await lib.getServerConnection("clouds5");
+    const wheely = await server.openProject("WHEELY_OBSERVABLE");
+
+    // Construct a mask that only includes labels.
+    let mask = wheely.constructSearchFieldMask(false, true, false, false);
+
+    const catUC = wheely.getCategory("UC");
+    const ucStepsFieldId = catUC.getFieldIdFromLabel("Use Case Steps")[0];
+    mask.addMask(catUC, [ucStepsFieldId]);
+
+    const items = await wheely.searchForItems("mrql:category=TC", "", false, mask);
+    let foundLabels = new Set();
+    for (let item of items) {
+        for (let label of item.getLabels()) {
+            foundLabels.add(label);
+        }
+    }
+    let output = [];
+    for (let l of foundLabels.values()) output.push(l);
+    console.log(`Found the following labels on TC Items: ${output.join(", ")}`);
+}
+
+run().then(() => process.exit(0));
+```
+
+And the output:
+
+```bash
+mstanton@darkstar:~/examples/users-guide (main)$ node partial-search-4.js
+Found the following labels on TC Items: ORANGE, NIGHTTIME, FORPRINTING, APPLE
+mstanton@darkstar:~/examples/users-guide (main)$ 
+```
+
+Cool, we can see our Labels on TCs.
+
+## "Raw" (low-level) search results
+
+If you want, you can go more "old school" and use method `searchRaw()` which takes parameter **fieldList**. You can use
+the mask as we've described to come up with your field mask, and then you can ask the mask for it's **fieldMaskString** in order
+to fill in that parameter correctly. Note that the field IDs are referenced, because those are unique:
+
+```js title="partial-search-5.js"
+const lib = require("./lib.js");
+
+function getMaskString(project) {
+    // Construct a mask for the purposes of getting a mask field string
+    let mask = project.constructSearchFieldMask(true, false, false, false);
+    const catREQ = project.getCategory("REQ");
+    mask.addMaskByNames(catREQ, ["Description"]);
+    const catUC = project.getCategory("UC");
+    mask.addMaskByNames(catUC, ["Use Case Steps"]);
+    return mask.getFieldMaskString();
+}
+
+async function run() {
+    const server = await lib.getServerConnection("clouds5");
+    const wheely = await server.openProject("WHEELY_OBSERVABLE");
+    const maskString = getMaskString(wheely);
+    let searchResults = await wheely.searchRaw("mrql:category=REQ or category=UC", "", maskString);
+    for (let result of searchResults) {
+        const strValue = JSON.stringify(result);
+        console.log(`${strValue.substring(0, 60)}...`);
+    }
+}
+
+run().then(() => process.exit(0));
+```
+
+The output of `searchRaw` isn't wrapped into **Item** objects, but remains in a low-level type:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk/examples/users-guide (main)$ node partial-search-5
+{"itemId":"REQ-1","version":3,"title":"Design / Looks","down...
+{"itemId":"REQ-2","version":3,"title":"Sized for Kids","down...
+{"itemId":"REQ-3","version":24,"title":"Wheels","downlinks":...
+{"itemId":"REQ-4","version":1,"title":"Seat","downlinks":[],...
+...
+```
+
+## Continuous Log of REST requests
+
+The SDK also has information about the REST calls made to the server over time. There is a list of the calls made. You might use this
+list to verify that only one call was made for a powerful search request. Let's have a look at the ${projects.sdk.getFetchLog().length} calls we've made to this
+point in our document:
+
+```js title="search-fetchlog.js"
+const lib = require("./lib.js");
+
+async function run() {
+    const server = await lib.getServerConnection("clouds5");
+    await (await server.openProject("WHEELY_OBSERVABLE"))
+        .searchForItems("mrql:category=REQ or category=UC");
+    console.log(server.getFetchLog().join("\n"));
+}
+
+run().then(() => process.exit(0));
+```
+
+You can see 3 calls were made:
+
+```bash
+mstanton@darkstar:~/examples/users-guide (main)$ node search-fetchlog
+https://clouds5.matrixreq.com/rest/1/
+https://clouds5.matrixreq.com/rest/1/WHEELY_OBSERVABLE?adminUI=1
+https://clouds5.matrixreq.com/rest/1/WHEELY_OBSERVABLE/needle
+mstanton@darkstar:~/examples/users-guide (main)$ 
+```
+
+One for Server information. The second call for Project information. The final request ("needle") is the search.
+We were finding needles in haystacks today.

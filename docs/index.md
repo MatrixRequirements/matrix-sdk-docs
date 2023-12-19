@@ -210,6 +210,69 @@ nice to kids from 6 to 10 years.</div>
 mstanton@darkstar:~/examples/users-guide (main)$ 
 ```
 
+Below is an overview of the services provided by the **Item** class. Note that we ship a TypeScript binding in the SDK,
+so descriptive types are available if you like:
+
+```typescript
+class Item {
+    // Basic information
+	getId(): string;
+	getIsFolder(): boolean;
+	getType(): string;
+	getCategory(): Category;
+	getMaxVersion(): number | undefined;
+	getHistory(): IItemHistory[];
+
+    // getters/setters for changeable information
+	getCreationDate(): string | undefined;
+	setCreationDate(creationDate: string): Item;
+	getTitle(): string;
+	setTitle(title: string): Item;
+
+    // uplinks and downlinks
+	getDownlinks(): IReference[];
+	hasDownlink(id: string): boolean;
+	setDownlinks(downLinks: IReference[]): Item;
+	addDownlink(id: string, title?: string): Item;
+	removeDownlink(id: string): Item;
+	getUplinks(): IReference[];
+	hasUplink(id: string): boolean;
+	setUplinks(upLinks: IReference[]): Item;
+	addUplink(id: string, title?: string): Item;
+	removeUplink(id: string): Item;
+
+    // Conversion to lower-level structure for interaction with REST APIs
+	extractData(): IItemPut;
+
+    // Label support
+	getLabels(): string[];
+	setLabels(newLabels: string[]): Item;
+	setLabel(labelToSet: string): Item;
+	unsetLabel(labelToUnset: string): Item;
+
+    // Clean/dirty information
+	needsSave(): boolean;
+
+    // Information on Category Fields
+	hasFieldId(fieldId: number): boolean;
+	getFieldById(fieldId: number): Field;
+	getFieldByName(fieldName: string): Field[];
+	getSingleFieldByName(fieldName: string): Field;
+	getFieldsByType(fieldType: string): Field[];
+
+    // Support for partial items (not all Fields from the Category are available)
+	hasAllFields(): boolean;
+	getFieldMask(): ItemFieldMask;
+	expandFieldMaskWithEmptyField(fieldId: number): Field;
+
+    // Support for notifications ("todos")
+	createTodo(users: string[], type: TodoTypes, text: string, atDate: Date): Promise<string>;
+	getTodos(includeDone?: boolean, includeAllUsers?: boolean, includeFuture?: boolean): Promise<GetTodosAck>;
+
+    // Conversion to a helper class for DOC Items.
+   	toDocItem(): Promise<DocItem>;
+}
+```
 We'll continue looking into **Items** later on in the guide.
 
 ## Folder structure
@@ -217,23 +280,6 @@ We'll continue looking into **Items** later on in the guide.
 A Matrix Project has a tree structure, with Items organized into Folders. A Folder is also a type of Item.
 **TreeFolders** are objects that emphasize the tree/folder structure. They are also cached, so you
 can query through them efficiently. Use **TreeFolder** for tasks involving moving **Items** around.
-The most important methods on **TreeFolder** are:
-
-* isRoot() - is this the root folder for the Category?
-* getId()
-* getTitle()
-* getParent()
-* getPath() - Creates a path string including all ancestor folder titles, separated by "/".
-* findFolder(folderId) - Returns a TreeFolder under the current folder, if it is a descendent.
-* findDirectFolderByTitle(folderTitle) - Finds a child folder with the given title if present.
-* saveInFolder(item)
-* moveItemsToThisFolder(itemIds) - given an array of Item Ids, moves them to the present folder.
-* deleteChildItemOrFolder(itemId, force)
-* getItem() - get the Item that matches this TreeFolder object.
-* getFolderChildren() - returns an array of TreeFolder objects. If not yet loaded, visits the server.
-* getItemChildren(): ITitleAndId[] - returns an array of title/id pairs for the Items in this folder.
-* getAllChildren(): ITitleAndId[] - returns title/id pairs for all Items, including Folders in this folder.
-
 We can examine the tree like so:
 
 ```js title="get-project-tree.js"
@@ -289,3 +335,25 @@ mstanton@darkstar:~/examples/users-guide (main)$ node get-project-tree.js
 ```
 
 <img src="./treediagram.svg">
+
+The most important methods on **TreeFolder** are:
+
+| TreeFolder method | Comments |
+| --- | --- |
+| isRoot() | is this the root folder for the Category? |
+| getId() ||
+| getTitle() ||
+| getParent() ||
+| getPath() | Creates a path string including all ancestor folder titles, separated by "/" |
+| findFolder(folderId) | Returns a TreeFolder under the current folder, if it is a descendent |
+| findDirectFolderByTitle(folderTitle) | Finds a child folder with the given title if present |
+| saveInFolder(item) ||
+| moveItemsToThisFolder(itemIds) | given an array of Item Ids, moves them to the present folder |
+| deleteChildItemOrFolder(itemId, force) ||
+| getItem() | get the Item that matches this TreeFolder object |
+| getFolderChildren() | returns an array of TreeFolder objects. If not yet loaded, visits the server |
+| getItemChildren() | returns an array of title/id pairs for the Items in this folder |
+| getAllChildren() | returns title/id pairs for all Items, including Folders in this folder |
+
+Continue with [Part II](part2.md) of this guide to dive into advanced searching. Thanks for your time!
+

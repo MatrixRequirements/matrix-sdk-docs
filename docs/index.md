@@ -38,33 +38,15 @@ from a JSON file. Create a file called `credentials.json` in the same directory 
 
 Now create a file `lib.js` with the following code:
 
-``` js
-const fs = require("fs");                                                       
-const sdk = require("matrix-requirements-sdk/server");                          
-                                                                                
-// Securely connect to a server with stored credentials                         
-async function getServerConnection(key) {                                       
-    const credentialsFilename = "./credentials.json";                           
-    const db = JSON.parse(fs.readFileSync(credentialsFilename, "utf-8"));       
-    return await sdk.createConsoleAPI(db[key]);                                 
-}                                                                               
-
-module.exports = { sdk, getServerConnection };
+``` js title="lib.js"
+--8<-- "codes/lib.js"
 ```
 
 `lib.js` wraps up getting the correct API Token for each Matrix Instance you'd like to connect to.
 Now let's use this library to list all the Projects available on a Matrix Instance.
 
-``` js
-const lib = require("./lib.js");
-
-async function run() {                                                          
-    const server = await getServerConnection("clouds5");                        
-    // List the projects available on this server:                              
-    console.log((await server.getProjects()).join(", "));                       
-}                                                                               
-                                                                                
-run().then(() => process.exit(0));
+``` js title="list-projects.js"
+--8<-- "codes/list-projects.js"
 ```
 
 Save this file as `list-projects.js` and run it at the command prompt. If you've set up your credentials file
@@ -86,44 +68,7 @@ and show the results in an HTML table. Run the following
 code to produce the table:
 
 ```js title="characterize-projects.js" 
-const lib = require("./lib.js");
-
-function getCharacterizations(projects) {
-  function makeTable(proj) {
-    const itemConfig = proj.getItemConfig();
-    let res = '<table><thead><th scope="row">Item</th><th scope="row">Fields</th></thead><tbody>';
-    let cats = itemConfig.getCategories();
-    // Ignore DOCs and REPORTs for now.
-    cats.splice(cats.indexOf("DOC"), 1);
-    cats.splice(cats.indexOf("REPORT"), 1);
-    for (let cat of cats) {
-      // Get the fields of the category.
-      let fields = [];
-      for (let field of itemConfig.getItemConfiguration(cat).fieldList) {
-          fields.push(`${field.label}(<i>${field.fieldType}</i>)`);
-      }
-      let renderedFields = fields.join(", ");
-      res += `<tr><td>${cat}</td><td>${renderedFields}</td></tr>`;
-    }
-    res += `</tbody></table>`;
-    return res;
-  }
-  let rows = "";
-  for (let project in projects) {
-    rows += `<tr><td>${projects[project].getName()}</td><td>${makeTable(projects[project])}</td></tr>\n`
-  }
-  return `<table>${rows}</table>`;
-}
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    let projects = {};
-    projects.wheely = await server.openProject("WHEELY_OBSERVABLE");
-    projects.insulin = await server.openProject("INSULINEPEN_SDK");
-    console.log(getCharacterizations(projects));
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/characterize-projects.js"
 ```
 
 Here is the HTML output from running `node ./characterize-projects.js`.
@@ -145,18 +90,9 @@ whatever fields the project owner considers important.
 Let's have a look at some actual Items. We can find some Item Ids using project method `searchForIds()`:
 
 ```js title="get-item-ids.js"
-const lib = require("./lib.js");
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    // List the projects available on this server:
-    const project = await server.openProject("WHEELY_OBSERVABLE");
-    const reqs = await project.searchForIds("mrql:Category=REQ");
-    console.log(reqs.join(", "));
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/get-item-ids.js"
 ```
+
 Running this at the command prompt returns a list of Item Ids returned by the query:
 
 ```bash
@@ -169,22 +105,7 @@ mstanton@darkstar:~/examples/users-guide (main)$
 The search query returned all of the items of type REQ in the `WHEELY_OBSERVABLE` project. Let's gather all information on the first one of the list:
 
 ```js title="get-one-item.js"
-const lib = require("./lib.js");
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    // List the projects available on this server:
-    const project = await server.openProject("WHEELY_OBSERVABLE");
-    const reqs = await project.searchForIds("mrql:Category=REQ");
-    const wheelyFirstREQ = await project.getItem(reqs[0]); 
-    console.log("ID: " + wheelyFirstREQ.getId());
-    console.log("Title: " + wheelyFirstREQ.getTitle());
-    const descriptionHandler = wheelyFirstREQ.getSingleFieldByName("Description").getHandler();
-    const desc = descriptionHandler.getHtml();
-    console.log(`Description: ${desc}`);
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/get-one-item.js"
 ```
 
 We know from the table above for `WHEELY_OBSERVABLE` that a `REQ`
@@ -283,38 +204,7 @@ can query through them efficiently. Use **TreeFolder** for tasks involving movin
 We can examine the tree like so:
 
 ```js title="get-project-tree.js"
-const lib = require("./lib.js");
-
-function convertToTreePaths(treeFolder) {
-    let obj = [];
-    const itemChildren = treeFolder.getItemChildren();
-    const folderChildren = treeFolder.getFolderChildren();
-    if (itemChildren.length == 0 && folderChildren.length == 0) {
-        obj.push(treeFolder.getPath());
-        return obj;
-    }
-  
-    for (let item of itemChildren) {
-        obj.push(treeFolder.getPath() + "/" + item.title);
-    }
-  
-    for (let folder of folderChildren) {
-        let childData = convertToTreePaths(folder);
-        obj = obj.concat(childData);
-    }
-    return obj;
-}
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    // List the projects available on this server:
-    const project = await server.openProject("WHEELY_OBSERVABLE");
-    const wheelyTree = await project.getProjectTree();
-    const mytree = convertToTreePaths(wheelyTree);
-    console.log(mytree);
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/get-project-tree.js"
 ```
 
 Running this program produces a list of full paths, which can be displayed in a fancy graph

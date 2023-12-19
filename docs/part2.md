@@ -16,37 +16,7 @@ The methods do the same thing, but **searchForItems** is designed to be friendli
 We'll create a mask that gives us back *partial Items* with only one field brought down from the server:
 
 ```js title="partial-search-1.js"
-const assert = require("assert");
-const lib = require("./lib.js");
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    const wheely = await server.openProject("WHEELY_OBSERVABLE");
-    // Construct a mask that includes fields, but no labels or up or down links.
-    let mask = wheely.constructSearchFieldMask(true, false, false, false);
-    const catREQ = wheely.getCategory("REQ");
-    const descriptionFieldId = catREQ.getFieldIdFromLabel("Description")[0];
-    mask.addMask(catREQ, [descriptionFieldId]);
-
-    // Now bring down all Items of category REQ with this field mask.
-    const reqs = await wheely.searchForItems("mrql:category=REQ", "", false, mask);
-
-    let rows = [];
-    for (let i = 0; i < Math.min(5, reqs.length); i++) {
-        const item = reqs[i];
-        assert(!item.hasAllFields());
-        assert(item.hasFieldId(descriptionFieldId));
-
-        const id = item.getId();
-        const title = item.getTitle();
-        const descriptionField = item.getSingleFieldByName("Description").getHandler();
-        const description = descriptionField.getHtml();
-        rows.push(`<tr><td>${id}</td><td>${title}</td><td>${description}</td></tr>`);
-    }
-    console.log(`<table>${rows.join('\n')}</table>`);
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/partial-search-1.js"
 ```
 
 Note that we asserted that the Items brought down only have the one Category REQ field we asked for, "Description". Typical HTML output is below:
@@ -66,44 +36,7 @@ What if we are looking for the **Description** field if we have a **REQ** Item, 
 No problem! You can construct the mask so that it will apply correctly to each kind of item returned:
 
 ```js title="partial-search-2.js"
-const assert = require("assert");
-const lib = require("./lib.js");
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    const wheely = await server.openProject("WHEELY_OBSERVABLE");
-
-    // Construct a mask that includes fields, but no labels or up or down links.
-    let mask = wheely.constructSearchFieldMask(true, false, false, false);
-
-    const catREQ = wheely.getCategory("REQ");
-    const descriptionFieldId = catREQ.getFieldIdFromLabel("Description")[0];
-    mask.addMask(catREQ, [descriptionFieldId]);
-
-    const catUC = wheely.getCategory("UC");
-    const ucStepsFieldId = catUC.getFieldIdFromLabel("Use Case Steps")[0];
-    mask.addMask(catUC, [ucStepsFieldId]);
-
-    // Now bring down all Items of category REQ and UC with this field mask.
-    const reqs = await wheely.searchForItems("mrql:category=REQ or category=UC", "", false, mask);
-
-    let reqCount = 0, ucCount = 0;
-    for (let i = 0; i < reqs.length; i++) {
-        const item = reqs[i];
-        assert(!item.hasAllFields());
-
-        if (item.getCategory() == catUC) {
-            assert(item.hasFieldId(ucStepsFieldId));
-            ucCount++;
-        } else if (item.getCategory() == catREQ) {
-            assert(item.hasFieldId(descriptionFieldId));
-            reqCount++;
-        }
-    }
-    console.log(`Project has ${reqCount} REQ Items, and ${ucCount} UC Items`);
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/partial-search-2.js"
 ```
 
 Run this program for the following result:
@@ -120,34 +53,8 @@ If you want to get all the items for a particular Category, you can request this
 Category object without using one of the search methods already mentioned, see line 15 below. And you can still
 use a mask to retrieve partial items if you like.
 
-```js linenums="1" title="partial-search-3"
-const assert = require("assert");
-const lib = require("./lib.js");
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    const wheely = await server.openProject("WHEELY_OBSERVABLE");
-
-    // Construct a mask that includes fields, but no labels or up or down links.
-    let mask = wheely.constructSearchFieldMask(true, false, false, false);
-
-    const catUC = wheely.getCategory("UC");
-    const ucStepsFieldId = catUC.getFieldIdFromLabel("Use Case Steps")[0];
-    mask.addMask(catUC, [ucStepsFieldId]);
-
-    const UCs = await catUC.getItems({ mask });
-    let total = 0;
-    for (let uc of UCs) {
-        assert(!uc.hasAllFields());
-        assert(uc.hasFieldId(ucStepsFieldId));
-
-        const fieldHandler = uc.getFieldById(ucStepsFieldId).getHandler();
-        total += fieldHandler.getRowCount();
-    }
-    console.log(`The average number of Use Case Steps in UC Items is ${total / UCs.length}`);
-}
-
-run().then(() => process.exit(0));
+```js linenums="1" title="partial-search-3.js"
+--8<-- "codes/partial-search-3.js"
 ```
 
 And the output follows:
@@ -169,32 +76,7 @@ download time. We get all the labels and print out the ones we found:
 
 
 ```js title="partial-search-4.js"
-const lib = require("./lib.js");
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    const wheely = await server.openProject("WHEELY_OBSERVABLE");
-
-    // Construct a mask that only includes labels.
-    let mask = wheely.constructSearchFieldMask(false, true, false, false);
-
-    const catUC = wheely.getCategory("UC");
-    const ucStepsFieldId = catUC.getFieldIdFromLabel("Use Case Steps")[0];
-    mask.addMask(catUC, [ucStepsFieldId]);
-
-    const items = await wheely.searchForItems("mrql:category=TC", "", false, mask);
-    let foundLabels = new Set();
-    for (let item of items) {
-        for (let label of item.getLabels()) {
-            foundLabels.add(label);
-        }
-    }
-    let output = [];
-    for (let l of foundLabels.values()) output.push(l);
-    console.log(`Found the following labels on TC Items: ${output.join(", ")}`);
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/partial-search-4.js"
 ```
 
 And the output:
@@ -214,30 +96,7 @@ the mask as we've described to come up with your field mask, and then you can as
 to fill in that parameter correctly. Note that the field IDs are referenced, because those are unique:
 
 ```js title="partial-search-5.js"
-const lib = require("./lib.js");
-
-function getMaskString(project) {
-    // Construct a mask for the purposes of getting a mask field string
-    let mask = project.constructSearchFieldMask(true, false, false, false);
-    const catREQ = project.getCategory("REQ");
-    mask.addMaskByNames(catREQ, ["Description"]);
-    const catUC = project.getCategory("UC");
-    mask.addMaskByNames(catUC, ["Use Case Steps"]);
-    return mask.getFieldMaskString();
-}
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    const wheely = await server.openProject("WHEELY_OBSERVABLE");
-    const maskString = getMaskString(wheely);
-    let searchResults = await wheely.searchRaw("mrql:category=REQ or category=UC", "", maskString);
-    for (let result of searchResults) {
-        const strValue = JSON.stringify(result);
-        console.log(`${strValue.substring(0, 60)}...`);
-    }
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/partial-search-5.js"
 ```
 
 The output of `searchRaw` isn't wrapped into **Item** objects, but remains in a low-level type:
@@ -254,23 +113,14 @@ mstanton@darkstar:~/work/matrix-sdk/examples/users-guide (main)$ node partial-se
 ## Continuous Log of REST requests
 
 The SDK also has information about the REST calls made to the server over time. There is a list of the calls made. You might use this
-list to verify that only one call was made for a powerful search request. Let's have a look at the ${projects.sdk.getFetchLog().length} calls we've made to this
-point in our document:
+list to verify that only one call was made for a powerful search request.
 
 ```js title="search-fetchlog.js"
-const lib = require("./lib.js");
-
-async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    await (await server.openProject("WHEELY_OBSERVABLE"))
-        .searchForItems("mrql:category=REQ or category=UC");
-    console.log(server.getFetchLog().join("\n"));
-}
-
-run().then(() => process.exit(0));
+--8<-- "codes/search-fetchlog.js"
 ```
 
-You can see 3 calls were made:
+The code above was written in the classic Node style using `Promises` rather
+than `async/await` just for fun. After running, you can see 3 calls were made to the server:
 
 ```bash
 mstanton@darkstar:~/examples/users-guide (main)$ node search-fetchlog

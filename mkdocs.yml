@@ -1,5 +1,5 @@
 site_name: Matrix Requirements SDK User's Guide
-site_url: http://localhost:8000
+site_url: https://matrixrequirements.github.io/matrix-sdk-docs/
 theme:
   name: material
   features:

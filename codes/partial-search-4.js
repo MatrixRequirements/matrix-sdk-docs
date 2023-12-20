@@ -5,7 +5,7 @@ async function run() {
     const wheely = await server.openProject("WHEELY_OBSERVABLE");
 
     // Construct a mask that only includes labels.
-    let mask = wheely.constructSearchFieldMask(false, true, false, false);
+    let mask = wheely.constructSearchFieldMask({ includeLabels: true });
 
     const catUC = wheely.getCategory("UC");
     const ucStepsFieldId = catUC.getFieldIdFromLabel("Use Case Steps")[0];

@@ -68,10 +68,19 @@ mstanton@darkstar:~/examples/users-guide (main)$
 ## A search retrieving Label information
 
 Of course, maybe you don't want any Fields to be brought down at all, only, say, labels.
-It's all in the `constructSearchFieldMask()` function, where the first parameter, **includeFields** is a boolean
-value. The second parameter, **includeLabels** is also a boolean. Both of these have a default value of
-true if left unspecified. The next two parameters, **includeDownlinks** and **includeUplinks** have a default
-value of false. Let's have a code example where we get Item objects, but no Category Fields, thus reducing
+It's all in the `constructSearchFieldMask()` function which takes a helper object:
+
+```
+  * includeFields      default true
+  * includeLabels      default true
+  * includeDownlinks   default false
+  * includeUplinks     default false
+
+  For example:
+    mask = constructSearchFieldMask({ includeFields: false, includeUplinks: true });
+```
+
+Let's have a code example where we get Item objects, but no Category Fields, thus reducing
 download time. We get all the labels and print out the ones we found:
 
 

@@ -29,6 +29,7 @@ theme:
       accent: lime
 
 markdown_extensions:
+  - mkdocs_graphviz
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
@@ -41,6 +42,9 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.mark
   - attr_list
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/gh/rod2ik/cdn@main/mkdocs/javascripts/mkdocs-graphviz.js
 
 copyright: |
   &copy; 2023 <a href="https://matrixreq.com/"  target="_blank" rel="noopener">Matrix Requirements</a>

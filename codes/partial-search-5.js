@@ -2,7 +2,7 @@ const lib = require("./lib.js");
 
 function getMaskString(project) {
     // Construct a mask for the purposes of getting a mask field string
-    let mask = project.constructSearchFieldMask(true, false, false, false);
+    let mask = project.constructSearchFieldMask({ includeFields: true });
     const catREQ = project.getCategory("REQ");
     mask.addMaskByNames(catREQ, ["Description"]);
     const catUC = project.getCategory("UC");

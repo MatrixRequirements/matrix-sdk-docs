@@ -22,6 +22,7 @@ Then run:
 
 ```
 pip install mkdocs-material
+pip install mkdocs-graphviz
 mkdocs serve
 ```
 

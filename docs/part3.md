@@ -20,8 +20,25 @@ digraph {
 }
 ```
 
+## Altering Downlinks in one Item
+
 Let's write a program that finds a random SPEC item which links to a TC. We'll remove the TC link and ensure that our now-changed
 item doesn't show up in the original query for SPECs which link to TCs. Then we'll put things back as we found them.
 This demonstrates making changes that affect the server.
 
+```js title="change-downlink.js"
+--8<-- "./codes/change-downlink.js"
+```
 
+This program is rather large because of the need to carefully set things back.
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node change-downlink
+Debugger attached.
+Found 4 SPEC Items that have TC downlinks. Choosing SPEC-11 at random.
+SPEC-11 linked to TC-4
+Item updated...re-running search query..
+Success changing and restoring SPEC-11.
+Waiting for the debugger to disconnect...
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$
+```

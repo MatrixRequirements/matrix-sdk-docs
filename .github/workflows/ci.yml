@@ -18,6 +18,7 @@ jobs:
         with:
           key: ${{ github.ref }}
           path: .cache
+      - run: sudo apt-get install graphviz
       - run: pip install mkdocs-material
       - run: pip install mkdocs-graphviz
       - run: pip install pillow cairosvg

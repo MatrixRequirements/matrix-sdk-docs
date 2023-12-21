@@ -18,3 +18,5 @@ node search-fetchlog.js
 # Article 3
 node relationships.js
 node change-downlink.js
+node bad-set-label.js
+node set-labels.js

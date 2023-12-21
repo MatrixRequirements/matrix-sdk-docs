@@ -8,4 +8,16 @@ async function getServerConnection(key) {
     return await sdk.createConsoleAPI(db[key]);
 }
 
-module.exports = { sdk, getServerConnection };
+async function getServerAndProject(connection, projectName) {
+    if (connection == undefined) {
+        connection = "clouds5";
+    }
+    if (projectName == undefined) {
+        projectName = "WHEELY_OBSERVABLE";
+    }
+    const server = await getServerConnection(connection);
+    const wheely = await server.openProject(projectName);
+    return [server, wheely];
+}
+
+module.exports = { sdk, getServerConnection, getServerAndProject };

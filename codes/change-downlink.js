@@ -2,8 +2,7 @@ const assert = require("assert");
 const lib = require("./lib.js");
 
 async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    const wheely = await server.openProject("WHEELY_OBSERVABLE");
+    const [server, wheely] = await lib.getServerAndProject();
     server.setComment("Changing for a test");
     const mask = wheely.constructSearchFieldMask({ includeDownlinks: true });
     const query = "mrql:category=SPEC and downLink=TC";

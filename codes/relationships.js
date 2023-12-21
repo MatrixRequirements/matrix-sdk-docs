@@ -1,8 +1,7 @@
 const lib = require("./lib.js");
 
 async function run() {
-    const server = await lib.getServerConnection("clouds5");
-    const wheely = await server.openProject("WHEELY_OBSERVABLE");
+    const [server, wheely] = await lib.getServerAndProject();
     const wheelyConfig = wheely.getItemConfig();
     const data = wheelyConfig.getCategories().map((c) => { 
       return { cat: c, downLinks: wheelyConfig.getItemConfiguration(c).downLinksRequired }; })

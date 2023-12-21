@@ -227,7 +227,8 @@ mstanton@darkstar:~/examples/users-guide (main)$ node get-project-tree.js
 
 <img src="./treediagram.svg">
 
-The most important methods on **TreeFolder** are:
+The most important methods on **TreeFolder** are (again, you can visit the full
+docs for **TreeFolder** <a href="reference/classes/serverSdk.TreeFolder.html" target="_blank">here</a>):
 
 | TreeFolder method | Comments |
 | --- | --- |

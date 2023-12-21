@@ -107,5 +107,56 @@ TC-1: After unset of DAYTIME (should have no effect)
   Labels: ORANGE, FORPRINTING, NIGHTTIME, APPLE
 TC-1: Labels set to empty
   Labels: 
-mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node set-labels
+TC-1 is dirty, not saving to the server
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ 
 ```
+
+Note that the DAYTIME label was removed when we set NIGHTTIME. Whereas the APPLE and ORANGE
+labels should not toggle on or off as we set one or the other. They are "OR" labels, not "XOR" labels.
+
+## Item creation
+
+The SDK is designed to support you in creating new Items. Generally, no trip to the server is necessary during
+construction of an Item. Once the Project configuration is locally available, Fields and Labels can be set
+in a validated way, as demonstrated above with Labels.
+
+The important methods for creating and saving Items are on the **Project**.
+
+* `Project.createItem(category: string): Item` - No trip to the server is made. An Item with no Id is returned.
+* `Project.putItem(folderId: string, item: Item): Promise<Item>` - Save an Item with no Id to the server.
+* `Project.updateItem(item: Item): Promise<Item>` - update an existing Item.
+* `Project.deleteItem(itemId: string, force?: boolean)` - Force must be true if the Item is a FOLDER with children.
+
+Let's create a UC (Use Case) object. There is a *steplist* Field type called "Use Case Steps". It will be
+interesting to see how you add rows to a table:
+
+```js title="create-uc.js"
+--8<-- "./codes/create-uc.js"
+```
+
+Running gives the output `Created Item UC-4` on my server, with the following screenshot:
+
+![Screenshot](img/new-uc.png)
+
+It turns out the milk is spoiled! We can change "Drink milk" in the 3rd row of the table like so:
+
+```js
+    const columnName = tableHandler.columnNumberToFieldId(0);
+    tableHandler.setColumnData(2, columnName, "Throw milk away");
+    // Be sure to update the server!
+```
+
+Let's make a program that does all of that then deletes the Item, so we don't leave our database a mess.
+
+```js title="create-uc-cleanup.js"
+--8<-- "./codes/create-uc-cleanup.js"
+```
+
+After running that, you can look at the changes made on your Matrix Project, and you'll see the delete
+mentioned at the top:
+
+![Screenshot](img/deleted-uc.png)
+
+## Uploading image attachments
+
+TBD...

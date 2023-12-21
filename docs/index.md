@@ -132,13 +132,14 @@ mstanton@darkstar:~/examples/users-guide (main)$
 ```
 
 Below is an overview of the services provided by the **Item** class. Note that we ship a TypeScript binding in the SDK,
-so descriptive types are available if you like:
+so descriptive types are available if you like (you can also see the full reference docs for **Item**
+<a href="reference/classes/serverSdk.Item.html" target="_blank">here</a>):
 
 ```typescript
 class Item {
     // Basic information
 	getId(): string;
-	getIsFolder(): boolean;
+	isFolder(): boolean;
 	getType(): string;
 	getCategory(): Category;
 	getMaxVersion(): number | undefined;

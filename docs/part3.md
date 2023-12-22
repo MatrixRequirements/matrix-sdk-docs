@@ -159,4 +159,5 @@ mentioned at the top:
 
 ## Uploading image attachments
 
-TBD...
+A *Richtext* Field can display images. Let's create a UC and upload an image to be displayed
+in the Description field.

@@ -22,3 +22,5 @@ node bad-set-label.js
 node set-labels.js
 # node create-uc.js   This one doesn't delete the record it creates, don't run it
 node create-uc-cleanup.js
+node upload-image.js
+node place-image.js

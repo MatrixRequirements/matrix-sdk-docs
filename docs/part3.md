@@ -159,5 +159,53 @@ mentioned at the top:
 
 ## Uploading image attachments
 
-A *Richtext* Field can display images. Let's create a UC and upload an image to be displayed
-in the Description field.
+A *Richtext* Field can display images.
+When we upload an attachment to the server, we're given back information we
+can turn into a URL to retrieve the image from the server again. Let's just try uploading an image
+and printing the URL returned by the server. We need the [**Axios**](https://www.npmjs.com/package/axios) library to do this.
+To load **Axios** into your project, run the following at the command prompt:
+
+```bash
+npm install axios
+```
+
+Below, we pass the Axios library to `Project.uploadLocalFile()` as the first parameter.
+We also need to create stream for the file on line 10.
+
+```js linenums="1" title="upload-image.js"
+--8<-- "./codes/upload-image.js"
+```
+
+You'll see output like this:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node upload-image
+Uploading...
+Uploading...
+Visit https://clouds5.matrixreq.com/rest/1/WHEELY_OBSERVABLE/file/11075?key=key_elnjk70etp7p1qadc5vuqss634 to get your file
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ 
+```
+
+Note that we're getting the image with `https`, but it is possible to get it without authentication. Just change
+the protocol to `http`. You can alter this on your Matrix server, such that all images require authentication.
+
+To add an uploaded image to a Richtext field, simply reference the URL in an html `img` tag, like so:
+
+```js linenums="1" title="place-image.js"
+--8<-- "./codes/place-image.js"
+```
+
+Running at the command prompt reveals:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node place-image
+Uploading...
+Uploading...
+Added image to UC-1
+```
+
+Which looks like this in the Matrix application:
+
+![Screenshot](img/typewriter-added.png)
+
+You can also upload attachments to be referenced by attachment fields.

@@ -208,4 +208,65 @@ Which looks like this in the Matrix application:
 
 ![Screenshot](img/typewriter-added.png)
 
-You can also upload attachments to be referenced by attachment fields.
+## File Attachments
+
+You can also upload attachments to be stored by `fileManager` fields. I've added
+a `fileManager` field to category SPEC, and attached a file. Our FieldHandler
+for the `fileManager` field type is bare-bones, only providing the `getData()` and
+`setData(string)` methods that every FieldHandler provides. We'll have to examine the
+data format in order to work with it correctly.
+
+```js title="get-attachments.js"
+--8<-- "./codes/get-attachments.js"
+```
+
+The code above prints out the JSON object it expects in the `fileManager` field:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node get-attachments
+[
+  {
+    fileName: 'cdt-overview.jpg',
+    fileId: '11085?key=key_fb77i3bti07cku2dp1f7lcglib'
+  }
+]
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ 
+```
+
+The data format of the field is an array of `{fileName, fileId}` tuples, where
+`fileId` is a concatenation of two fields in the [AddFileAck](/reference/interfaces/serverSdk.AddFileAck.html)
+structure returned by `Project.uploadLocalFile()` and `Project.uploadFile()`, `fileId` and `key`.
+
+Let's try our hand at uploading a second file and saving it:
+
+```js title="upload-file-manager.js"
+--8<-- "./codes/upload-file-manager.js"
+```
+
+Running at the command prompt, we get:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node upload-file-manager
+Uploaded /Users/mstanton/work/matrix-sdk-docs/codes/resources/typewriter.jpg to
+ https://clouds5.matrixreq.com/rest/1/WHEELY_OBSERVABLE/file/11088?key=key_r8ovlj5cf9d1o53t5qfhli9p9r
+[
+  {
+    fileName: 'cdt-overview.jpg',
+    fileId: '11085?key=key_fb77i3bti07cku2dp1f7lcglib'
+  },
+  {
+    fileName: 'typewriter.jpg',
+    fileId: '11088?key=key_r8ovlj5cf9d1o53t5qfhli9p9r'
+  }
+]
+Updated SPEC-2
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ 
+```
+
+Looking at SPEC-2 in the Matrix application, we can see we've got two attachments that
+can be downloaded:
+
+![Screenshot](img/file-manager.png)
+
+We hope you enjoy using the SDK to solve problems. Beyond this guide, the [FAQ](zee-faq.md) and
+[Reference documentation](ref.md) may be helpful.

@@ -24,3 +24,5 @@ node set-labels.js
 node create-uc-cleanup.js
 node upload-image.js
 node place-image.js
+node get-attachments.js
+node upload-file-manager.js

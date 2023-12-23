@@ -140,4 +140,7 @@ mstanton@darkstar:~/examples/users-guide (main)$
 ```
 
 One for Server information. The second call for Project information. The final request ("needle") is the search.
-We were finding needles in haystacks today.
+We were finding needles in haystacks today!
+
+Have a look at [Part 3](part3.md) of the User's Guide for more information on saving items, uplinks
+and downlinks between items, labels and attachments. Thanks for your time!

@@ -57,3 +57,78 @@ For Node this is not ideal, and we plan to load dependencies from the Node
 environment in a future release. Axios is required for just one call,
 [`Project.uploadLocalFile()`](reference/classes/serverSdk.Project.html#uploadLocalFile)
 so we prefered not to bundle it.
+
+## Can I create Notifications with the SDK?
+
+Yes, as long as [the feature is enabled on the server](https://docs23.matrixreq.com/usv23/notifications-settings). The `Item` class includes two methods for manipulating "Todos," another name for notifications:
+
+* [createTodo(users, type, text, atDate)](reference/classes/serverSdk.Item.html#createTodo) - create a Todo for multiple users and return ids. The `type` field is a string from the [`TodoTypes` enum](reference/enums/serverSdk.TodoTypes.html)
+* [getTodos(includeDone, includeAllUsers, includeFuture)](reference/classes/serverSdk.Item.html#getTodos) - return information on Todos active for this item
+
+Additionally, [`Project.getTodos()`](reference/classes/serverSdk.Project.html#getTodos) returns information
+on all Todos active in the Project. Let's create two Todos and verify that they can be found from the
+`Project`` class:
+
+```js title="todos.js"
+--8<- "./codes/todos.js"
+```
+
+The returned structure includes all Todos in the project, as well as a summary report of the active
+Todos for the current user. My API Token is attached to my user account which is `mike`, so we see that
+Mike has 1 Todo:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node todos
+Created Todos 382, 383
+{
+  todos: [
+    {
+      todoId: 383,
+      userId: 7,
+      login: 'francois',
+      projectShort: 'WHEELY_OBSERVABLE',
+      itemRef: 'UC-2',
+      auto: false,
+      originatorUserId: 23,
+      originatorLogin: 'mike',
+      action: [Object],
+      createdAt: '2023-12-24T10:12:38.458Z',
+      createdAtUserFormat: '2023/12/24 10:12:38',
+      future: false
+    },
+    {
+      todoId: 382,
+      userId: 23,
+      login: 'mike',
+      projectShort: 'WHEELY_OBSERVABLE',
+      itemRef: 'UC-1',
+      auto: false,
+      originatorUserId: 23,
+      originatorLogin: 'mike',
+      action: [Object],
+      createdAt: '2023-12-24T10:12:38.352Z',
+      createdAtUserFormat: '2023/12/24 10:12:38',
+      future: false
+    }
+  ],
+  todoCounts: [
+    {
+      userId: 23,
+      login: 'mike',
+      projectId: 360,
+      projectShort: 'WHEELY_OBSERVABLE',
+      nbTodos: 1,
+      firstTodos: [Array]
+    }
+  ]
+}
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ 
+```
+
+If I log in as `mike`, I can see the newly created Todo:
+
+![Screenshot](img/my-notifications.png)
+
+The Matrix server resists creating too many similar Todos. So if the user, date and
+description are the same as an existing Todo, a new Todo won't be created (-1 will be returned as the
+Todo Id).

@@ -5,6 +5,25 @@ This FAQ contains answers to questions you're likely to have at some point.
 
 ## What about saving server settings?
 
+This is easy with [`Server.getServerSettings()`](https://matrixrequirements.github.io/matrix-sdk-docs/reference/classes/serverSdk.StandaloneMatrixSDK.html#getServerSettings),
+as demonstrated in the program below:
+
+```js title="server-setting.js"
+--8<- "./codes/server-setting.js"
+```
+
+Note that we get a `favorites` setting, and create a simple object with our favorite things
+in it if the setting doesn't exist yet. Here are two runs of the program:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node server-setting.js
+Saved favorites
+{ car: 'Mustang', food: 'Tacos', music: 'Post-rock' }
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node server-setting.js
+Found existing favorites
+{ car: 'Mustang', food: 'Tacos', music: 'Post-rock' }
+```
+
 ## How do I create test cases (XTC objects)?
 
 ## How do I deal with DOC objects?

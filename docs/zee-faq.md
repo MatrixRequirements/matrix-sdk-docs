@@ -24,9 +24,63 @@ Found existing favorites
 { car: 'Mustang', food: 'Tacos', music: 'Post-rock' }
 ```
 
-## How do I create test cases (XTC objects)?
+## How do I create test cases (XTC Items)?
+
+XTC Items are created by a server-side process from a collection of source items (usually 
+TC (Test Cases), but it depends on your configuration). You can do this from the SDK by calling
+[`Project.execute()`](reference/classes/serverSdk.Project.html#execute) and passing
+an [`ExecuteParam`](reference/interfaces/serverSdk.ExecuteParam.html) structure
+giving the source objects and output folder for the newly-created XTC items.
+
+Normally, the `ExecuteParam` structure is populated with defaults from the Project
+Test Configuration, which you can set up in the Administration panel here:
+
+![Screenshot](img/test-config-panel.png)
+
+Because this is usually what you want to use as a source for creating XTCs, we have a
+convenience method [`Project.createExecuteParamWithDefaults()`](reference/classes/serverSdk.Project.html#createExecuteParamWithDefaults) to fill in the mapping from source item fields to
+target (XTC) fields. The code below creates a folder "Test Results" if it doesn't exist,
+then kicks off creation of XTCs with `Project.execute()`:
+
+```js title="execute-call.js"
+--8<- "./codes/execute-call.js"
+```
+
+Here is the console output after a run, showing the structure of the `ExecuteParam` object
+created for the call to `execute()`, along with the Id of the folder with the new XTCs:
+
+```bash
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$ node execute-call
+{
+  input: [ 'F-TC-1' ],
+  output: 'XTC',
+  reason: 'Create XTCs 1599.5004580020905',
+  itemFieldMapping: [
+    { fromId: 37379, toId: 37383 },
+    { fromId: 37380, toId: 37388 },
+    { fromId: 37381, toId: 37389 },
+    { fromId: 37382, toId: 37390 },
+    { fromId: 37365, toId: 37383 },
+    { fromId: 37366, toId: 37388 },
+    { fromId: 37367, toId: 37389 },
+    { fromId: 37368, toId: 37390 }
+  ],
+  parentFolder: 'F-XTC-59'
+}
+Created folder F-XTC-62
+mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$
+```
+
+And here is the state of the project after running two times:
+
+![Screenshot](img/xtc-results.png);
+
+Note the Folder named "Test Results" which we've made serve as the parent folder for
+generating a set of XTCs.
 
 ## How do I deal with DOC objects?
+
+To be done...
 
 ## How do I run a server hook?
 

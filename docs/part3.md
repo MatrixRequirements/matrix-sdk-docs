@@ -234,7 +234,7 @@ mstanton@darkstar:~/work/matrix-sdk-docs/codes (main)$
 ```
 
 The data format of the field is an array of `{fileName, fileId}` tuples, where
-`fileId` is a concatenation of two fields in the [AddFileAck](/reference/interfaces/serverSdk.AddFileAck.html)
+`fileId` is a concatenation of two fields in the [AddFileAck](reference/interfaces/serverSdk.AddFileAck.html)
 structure returned by `Project.uploadLocalFile()` and `Project.uploadFile()`, `fileId` and `key`.
 
 Let's try our hand at uploading a second file and saving it:

@@ -29,5 +29,8 @@ node upload-file-manager.js
 
 # FAQ
 node todos.js
-node server-settings.js
+node server-setting.js
 node execute-call.js
+node get-doc-8.js
+node get-doc-8-moredetail.js
+node get-doc-8-pdf.js

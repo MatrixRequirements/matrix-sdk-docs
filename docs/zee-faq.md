@@ -80,7 +80,115 @@ generating a set of XTCs.
 
 ## How do I deal with DOC objects?
 
-To be done...
+A DOC is like a unique, stand-alone [`Item`](reference/classes/serverSdk.Item.html)
+[`Category`](reference/classes/serverSdk.Category.html). The DOC describes the fields that it contains,
+configures the fields, and includes the content for the fields. This makes it a more complex
+object to work with than an ordinary Item, where configuration is done at the Category level.
+
+With that in mind, we've provided the [`DocItem`](reference/classes/serverSdk.DocItem.html) class, which
+has all the features of the Item class with some extra helper methods. First, let's bring down
+an existing DOC and explore it with the DocItem class. In the `WHEELY_OBSERVABLE` Project
+we've got `DOC-8` which is a Design Review. It has a signature field, a summary rich text
+field and a queried list of reviewed items that show up when the document is rendered.
+
+Rather than calling `getFields()`, you should call `getInnerDHFFields()` on a `DocItem`.
+This is because at its core, the DOC is the same as any other Item, and has a set of Fields,
+however, the names of the fields are of the form "dhf01", "dhf02", and so on. Looking at the UI,
+you see much more useful names like "Signatures" and "Review Summary." Method `getInnerDHFFields()`
+allows you to use those human-readable names and see the configuration for the fields easily too.
+
+Let's list the field names in the DOC:
+
+```js title="get-doc-8.js"
+--8<-- "codes/get-doc-8.js"
+```
+
+Which gives the following output, showing the user-readable field names and the field types:
+
+```bash
+Fields in DOC-8:
+"Signatures" [signaturebox]
+"Review Summary" [richtext]
+"Reviewed Items" [items]
+```
+
+`IDocFieldHandler` offers the following methods in addition to what `IFieldHandler` provides:
+
+```typescript
+export interface IDocFieldHandler extends IFieldHandler{
+    dhfFieldConfig: IAnyMap;
+
+    setDHFConfig(config:IAnyMap):void;
+    getDefaultConfig():any;
+    getXmlValue():string;
+
+    getFieldName(): string;
+    setFieldName(value: string): void;
+    addSignatures (signatures: string[], includeAll?:boolean): void;
+}
+```
+
+We can print the field configuration as a JSON object, and the field data (string or JSON object).
+
+```js title="get-doc-8-moredetail.js"
+--8<-- "codes/get-doc-8-moredetail.js"
+```
+
+Which gives the following output, showing the user-readable field names and the field types:
+
+```bash
+Fields in DOC-8:
+"Signatures" [signaturebox]
+  {
+    columns: [
+      {
+        name: 'Signature Meaning',
+        field: 'col0',
+        columnType: 'type6',
+        pos: 0
+      },
+      { name: 'Name', field: 'col1', columnType: 'type4', pos: 1 },
+      { name: 'Title', field: 'col2', columnType: 'type0', pos: 2 },
+      { name: 'Date', field: 'col3', columnType: 'type5', pos: 3 },
+      { name: 'Signature', field: 'col4', columnType: 'type3', pos: 4 }
+    ]
+  }
+  [
+    { col0: 'Reviewer', col1: 'wolfgang', col2: 'qa engineer' },
+    { col0: 'Reviewer', col1: 'yves', col2: 'product manager' }
+  ]
+"Review Summary" [richtext]
+  { page_break: false }
+  The items below have been reviewed whether they are quantifiable for testing purposes.
+"Reviewed Items" [items]
+  {
+    breadcrumb: true,
+    extracolumn: '',
+    showlinks: true,
+    page_break: false,
+    folderDetails: '',
+    showUpOnly: false,
+    showDownOnly: false,
+    showDeeplinks: false,
+    showExternal: 0,
+    dateoptions: '',
+    refdocs: false,
+    hideLinkErrors: false,
+    hideLabels: false,
+    showAllParentFolders: false,
+    hideEmptyFolders: false,
+    includeInToc: false,
+    breakAfterItems: false
+  }
+  [ { to: 'F-REQ-1', title: 'Requirements' } ]
+```
+
+To render and download a DOC as a PDF, you can call 
+```js title="get-doc-8-pdf.js"
+--8<-- "codes/get-doc-8-pdf.js"
+```
+
+TODO: we can't actually get the PDF without exposing another REST method....
 
 ## How do I run a server hook?
 

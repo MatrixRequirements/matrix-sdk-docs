@@ -183,12 +183,29 @@ Fields in DOC-8:
   [ { to: 'F-REQ-1', title: 'Requirements' } ]
 ```
 
-To render and download a DOC as a PDF, you can call 
+To render and download a DOC as a PDF, you can call `toPDF()` and `downloadJobResult()`:
+
 ```js title="get-doc-8-pdf.js"
 --8<-- "codes/get-doc-8-pdf.js"
 ```
 
-TODO: we can't actually get the PDF without exposing another REST method....
+We can render a DOC as PDF, Word or HTML. The program saves the PDF render to disk where it can
+be opened with any PDF file reader:
+
+```bash
+darkstar:~/matrix-sdk-docs/codes $ node get-doc-8-pdf.js
+Progress: 10%
+Progress: 40%
+Progress: 40%
+Progress: 40%
+Progress: 90%
+Progress: 91%
+Progress: 91%
+Progress: 100%
+Downloading Job 4853 File 7393 as download.pdf...
+```
+
+![Screenshot](img/pdf-output.png);
 
 ## How do I run a server hook?
 

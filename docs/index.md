@@ -32,7 +32,7 @@ from a JSON file. Create a file called `credentials.json` in the same directory 
   "clouds5": {
     "token": "Token <INSERT YOUR TOKEN HERE>",
     "url": "https://clouds5.matrixreq.com"
-  },
+  }
 }
 ```
 

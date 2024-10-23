@@ -8,10 +8,12 @@ function printLabels(item, msg) {
 
 async function run() {
     const [server, wheely] = await lib.getServerAndProject();
+
     const tcs = await wheely.searchForItems("mrql:category=TC");
     const itemIndex = Math.floor(Math.random() * tcs.length);
     let tc = tcs[itemIndex];
 
+    server.setComment("Changing labels");
     const oldLabels = [...tc.getLabels()];
     printLabels(tc, "Initial state");
     tc.setLabel("DAYTIME");

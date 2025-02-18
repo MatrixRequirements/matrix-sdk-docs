@@ -5,7 +5,7 @@ This FAQ contains answers to questions you're likely to have at some point.
 
 ## Why do I need to set comments?
 Whenever you change an item with the SDK, you need to set a comment first. This is achieved using the function 
-[`server.setComment("My comment"`](https://matrixrequirements.github.io/matrix-sdk-docs/reference/classes/serverSdk.StandaloneMatrixSDK.html#setComment)
+[`server.setComment("My comment")`](https://matrixrequirements.github.io/matrix-sdk-docs/reference/classes/serverSdk.StandaloneMatrixSDK.html#setComment)
 If not set, the udpdate call will return a 403 error code. 
 
 
